@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { motion } from "motion/react";
 import { profile } from "@/content/profile";
 import { prefersReducedMotion } from "@/lib/gsap";
+import { celebrate } from "@/lib/mood";
 import { play } from "@/lib/sound";
 
 const CONFETTI_COLORS = ["var(--pink)", "var(--cyan)", "var(--gold)", "var(--ink)"];
@@ -82,7 +83,13 @@ export function Finale({ hasCv, onOpenCv }: { hasCv: boolean; onOpenCv: () => vo
     const reduced = prefersReducedMotion();
     const timers = [
       window.setTimeout(() => play("confetti"), reduced ? 0 : 900),
-      window.setTimeout(() => play("fanfare"), reduced ? 300 : 2100),
+      window.setTimeout(
+        () => {
+          play("fanfare");
+          celebrate();
+        },
+        reduced ? 300 : 2100,
+      ),
     ];
     return () => timers.forEach(clearTimeout);
   }, []);

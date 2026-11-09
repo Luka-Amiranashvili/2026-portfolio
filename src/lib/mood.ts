@@ -13,6 +13,21 @@ export function setMood(next: Mood) {
   listeners.forEach((l) => l());
 }
 
+let celebrations = 0;
+
+export function celebrate() {
+  celebrations++;
+  listeners.forEach((l) => l());
+}
+
+export function useCelebrations() {
+  return useSyncExternalStore(
+    subscribe,
+    () => celebrations,
+    () => 0,
+  );
+}
+
 function subscribe(listener: () => void) {
   listeners.add(listener);
   return () => listeners.delete(listener);
