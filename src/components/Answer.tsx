@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import type { Block } from "@/content/profile";
 import { gsap, prefersReducedMotion, SplitText, useGSAP } from "@/lib/gsap";
+import { setMood } from "@/lib/mood";
 import { play } from "@/lib/sound";
 import { RichText } from "./RichText";
 import { ContactBlock, ProjectsBlock, StackBlock } from "./blocks";
@@ -62,6 +63,12 @@ export function Answer({ blocks, onDone }: Props) {
     },
     { dependencies: [phase] },
   );
+
+  useEffect(() => {
+    setMood(
+      phase === "typing" ? "thinking" : phase === "speaking" ? "talking" : "idle",
+    );
+  }, [phase]);
 
   useEffect(() => {
     if (phase === "done") onDone?.();
