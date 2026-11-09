@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { motion } from "motion/react";
 import { profile } from "@/content/profile";
+import { prefersReducedMotion } from "@/lib/gsap";
+import { play } from "@/lib/sound";
 
 const CONFETTI_COLORS = ["var(--pink)", "var(--cyan)", "var(--gold)", "var(--ink)"];
 
@@ -75,6 +77,15 @@ function HireOMeter() {
 
 export function Finale({ hasCv, onOpenCv }: { hasCv: boolean; onOpenCv: () => void }) {
   const mailto = `mailto:${profile.email}?subject=${encodeURIComponent("Next round with Luka")}`;
+
+  useEffect(() => {
+    const reduced = prefersReducedMotion();
+    const timers = [
+      window.setTimeout(() => play("confetti"), reduced ? 0 : 900),
+      window.setTimeout(() => play("fanfare"), reduced ? 300 : 2100),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   return (
     <motion.section

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, type Variants } from "motion/react";
 import { profile, projects, stackGroups, type Project } from "@/content/profile";
+import { play } from "@/lib/sound";
 
 const cardColors = [
   { bar: "bg-pink", shadow: "shadow-[8px_8px_0_var(--pink)]" },
@@ -34,6 +35,7 @@ function StarSticker({ label }: { label: string }) {
       initial={{ scale: 0, rotate: -90 }}
       animate={{ scale: 1, rotate: 12 }}
       transition={{ type: "spring", stiffness: 260, damping: 12, delay: 0.5 }}
+      onAnimationComplete={() => play("sparkle")}
       className="absolute -right-4 -top-5 z-10 grid size-24 place-items-center sm:-right-6 sm:-top-7 sm:size-28"
     >
       <motion.svg
@@ -67,7 +69,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   const Tag = project.href ? motion.a : motion.article;
 
   return (
-    <motion.div variants={flipIn} className={`perspective-distant ${index === 0 ? "md:col-span-2" : ""}`}>
+    <motion.div
+      variants={flipIn}
+      onAnimationStart={() => play("flip")}
+      className={`perspective-distant ${index === 0 ? "md:col-span-2" : ""}`}
+    >
       <Tag
         {...(project.href ? { href: project.href, target: "_blank", rel: "noreferrer" } : {})}
         whileHover={{ y: -6, rotate: index % 2 ? 0.8 : -0.8 }}
@@ -126,6 +132,7 @@ export function StackBlock() {
               <motion.span
                 key={item}
                 variants={popIn}
+                onAnimationStart={(def) => def === "show" && play("pop")}
                 whileHover={{ y: -3, scale: 1.06 }}
                 className="cursor-default rounded-xl bg-ink px-3 py-1.5 text-sm font-semibold text-stage"
               >
@@ -145,6 +152,7 @@ export function ContactBlock() {
   async function copy() {
     try {
       await navigator.clipboard.writeText(profile.email);
+      play("copy");
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -164,7 +172,7 @@ export function ContactBlock() {
           href={`mailto:${profile.email}`}
           whileHover={{ y: -4 }}
           whileTap={{ y: 4 }}
-          className="rounded-2xl bg-pink px-6 py-4 font-display text-lg tracking-[0.05em] text-ink shadow-[0_7px_0_#9e1450] sm:text-2xl"
+          className="rounded-2xl bg-pink px-6 py-4 font-display text-lg tracking-wider text-ink shadow-[0_7px_0_#9e1450] sm:text-2xl"
         >
           Call the contestant
         </motion.a>

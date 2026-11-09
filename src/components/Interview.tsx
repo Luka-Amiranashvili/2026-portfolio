@@ -30,8 +30,14 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
 
   const onIntroDone = useCallback(() => setIntroStarted(true), []);
   const onAnswerDone = useCallback(() => setBusy(false), []);
-  const openCv = useCallback(() => setCvOpen(true), []);
-  const closeCv = useCallback(() => setCvOpen(false), []);
+  const openCv = useCallback(() => {
+    play("swooshUp");
+    setCvOpen(true);
+  }, []);
+  const closeCv = useCallback(() => {
+    play("swooshDown");
+    setCvOpen(false);
+  }, []);
 
   const ask = useCallback(
     (id: string) => {
