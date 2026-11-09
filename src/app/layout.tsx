@@ -11,10 +11,15 @@ const display = Bungee({
 });
 const sans = Rubik({ variable: "--font-rubik", subsets: ["latin"] });
 
+const title = "CV Show | Luka Amiranashvili, full-stack developer";
+const description =
+  "Skip the CV and interview me instead. Full-stack developer in Tbilisi working with Next.js, TypeScript, Node.js and Flutter.";
+
 export const metadata: Metadata = {
-  title: "CV Show | Luka Amiranashvili, full-stack developer",
-  description:
-    "Skip the CV and interview me instead. Full-stack developer in Tbilisi working with Next.js, TypeScript, Node.js and Flutter.",
+  title,
+  description,
+  openGraph: { title, description, type: "website" },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
