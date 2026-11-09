@@ -20,6 +20,7 @@ type Props = {
 export function QuestionDock({ remaining, busy, onAsk }: Props) {
   return (
     <motion.nav
+      id="question-dock"
       aria-label="Questions"
       initial={{ y: "120%" }}
       animate={{ y: 0 }}

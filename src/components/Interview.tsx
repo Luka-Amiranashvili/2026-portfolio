@@ -21,6 +21,7 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
   const [busy, setBusy] = useState(true);
   const [cvOpen, setCvOpen] = useState(false);
   const lenis = useLenis();
+  const introRef = useRef<HTMLDivElement>(null);
   const roundsRef = useRef<HTMLDivElement>(null);
   const finaleRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +46,26 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
   useEffect(() => {
     setMusicDucked(busy || cvOpen);
   }, [busy, cvOpen]);
+
+  useEffect(() => {
+    const el = introRef.current;
+    if (!introStarted || !lenis || !el) return;
+    const keepAboveDock = () => {
+      const dockHeight =
+        document.getElementById("question-dock")?.offsetHeight ?? 0;
+      const limit = window.innerHeight - dockHeight - 16;
+      const overflow = el.getBoundingClientRect().bottom - limit;
+      if (overflow <= 0) return;
+      lenis.resize();
+      lenis.scrollTo(lenis.scroll + overflow, {
+        duration: 0.8,
+        immediate: prefersReducedMotion(),
+      });
+    };
+    const observer = new ResizeObserver(keepAboveDock);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [introStarted, lenis]);
 
   useEffect(() => {
     if (asked.length === 0) return;
@@ -120,11 +141,13 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
       <Hero play={started} onIntroDone={onIntroDone} />
 
       <main
-        className="relative mx-auto max-w-5xl px-4 pb-56 pt-16 sm:px-8"
+        className="relative mx-auto max-w-5xl px-4 pb-72 pt-16 sm:px-8"
         role="log"
         aria-live="polite"
       >
-        {introStarted && <Answer blocks={intro} onDone={onAnswerDone} />}
+        <div ref={introRef}>
+          {introStarted && <Answer blocks={intro} onDone={onAnswerDone} />}
+        </div>
 
         <div ref={roundsRef}>
           {asked.map((id, i) => {
