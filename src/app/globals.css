@@ -144,6 +144,31 @@ body {
   padding: 0 0.1em;
 }
 
+.curtain {
+  background:
+    radial-gradient(120% 90% at 50% 40%, transparent 40%, rgb(40 0 20 / 0.55)),
+    repeating-linear-gradient(
+      90deg,
+      #7a0d3c 0 34px,
+      #a8195a 34px 58px,
+      #c42468 58px 70px,
+      #a8195a 70px 94px,
+      #7a0d3c 94px 128px
+    );
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.6);
+}
+
+.curtain-fringe {
+  height: 18px;
+  transform: translateY(100%);
+  background: radial-gradient(
+      circle at 50% 0,
+      var(--gold) 0 9px,
+      transparent 10px
+    )
+    0 0 / 22px 18px repeat-x;
+}
+
 .no-scrollbar {
   scrollbar-width: none;
 }

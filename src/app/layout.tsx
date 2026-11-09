@@ -25,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <noscript>
-          <style>{".pre-anim{visibility:visible!important}"}</style>
+          <style>{".pre-anim{visibility:visible!important}.start-screen{display:none!important}"}</style>
         </noscript>
       </head>
       <body className="min-h-full font-sans text-ink">

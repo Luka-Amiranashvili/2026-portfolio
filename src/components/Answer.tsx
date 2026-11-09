@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import type { Block } from "@/content/profile";
 import { gsap, prefersReducedMotion, SplitText, useGSAP } from "@/lib/gsap";
+import { play } from "@/lib/sound";
 import { RichText } from "./RichText";
 import { ContactBlock, ProjectsBlock, StackBlock } from "./blocks";
 
@@ -36,6 +37,7 @@ export function Answer({ blocks, onDone }: Props) {
 
   useEffect(() => {
     if (phase !== "typing") return;
+    play("bubble");
     const t = setTimeout(() => setPhase("speaking"), 750);
     return () => clearTimeout(t);
   }, [phase]);
@@ -50,7 +52,8 @@ export function Answer({ blocks, onDone }: Props) {
         y: 16,
         duration: 0.45,
         ease: "back.out(2.5)",
-        stagger: 0.035,
+        // onStart runs once per word as it pops in; the sound engine throttles the ticks.
+        stagger: { each: 0.035, onStart: () => play("tick") },
         onComplete: () => {
           split.revert();
           setPhase("done");

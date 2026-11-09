@@ -5,16 +5,19 @@ import { AnimatePresence, motion } from "motion/react";
 import { useLenis } from "lenis/react";
 import { intro, questions } from "@/content/profile";
 import { prefersReducedMotion } from "@/lib/gsap";
+import { play, setMusicDucked } from "@/lib/sound";
 import { Answer } from "./Answer";
 import { CvSheet } from "./CvSheet";
 import { Finale } from "./Finale";
 import { Hero } from "./Hero";
 import { QuestionDock } from "./QuestionDock";
+import { SoundToggle } from "./SoundToggle";
+import { StartScreen } from "./StartScreen";
 
 export function Interview({ hasCv }: { hasCv: boolean }) {
+  const [started, setStarted] = useState(false);
   const [introStarted, setIntroStarted] = useState(false);
   const [asked, setAsked] = useState<string[]>([]);
-  // True while Luka is "talking". Starts true so nothing can be asked before the intro finishes.
   const [busy, setBusy] = useState(true);
   const [cvOpen, setCvOpen] = useState(false);
   const lenis = useLenis();
@@ -22,7 +25,6 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
   const finaleRef = useRef<HTMLDivElement>(null);
 
   const remaining = questions.filter((q) => !asked.includes(q.id));
-  // Every question asked and the last answer has finished.
   const finished = remaining.length === 0 && !busy;
 
   const onIntroDone = useCallback(() => setIntroStarted(true), []);
@@ -33,50 +35,58 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
   const ask = useCallback(
     (id: string) => {
       if (busy) return;
+      play("click");
       setBusy(true);
       setAsked((a) => [...a, id]);
     },
     [busy],
   );
 
-  // Follow the conversation: bring each new round to the top of the screen as soon as it's asked.
-  // The newest round reserves a full screen of height (see min-h below), so the scroll can always reach it.
+  useEffect(() => {
+    setMusicDucked(busy || cvOpen);
+  }, [busy, cvOpen]);
+
   useEffect(() => {
     if (asked.length === 0) return;
     const raf = requestAnimationFrame(() => {
       const last = roundsRef.current?.lastElementChild as HTMLElement | null;
       if (!last || !lenis) return;
-      // Lenis re-measures page height only 250ms after a change and clamps scrollTo to the old height.
-      // The new round just made the page taller, so re-measure now or the scroll stops short.
       lenis.resize();
-      lenis.scrollTo(last, { offset: -90, duration: 0.9, immediate: prefersReducedMotion() });
+      lenis.scrollTo(last, {
+        offset: -90,
+        duration: 0.9,
+        immediate: prefersReducedMotion(),
+      });
     });
     return () => cancelAnimationFrame(raf);
   }, [asked.length, lenis]);
 
-  // When the last answer finishes, bring the finale into view.
   useEffect(() => {
     if (!finished || !lenis) return;
     const raf = requestAnimationFrame(() => {
       if (!finaleRef.current) return;
       lenis.resize();
-      lenis.scrollTo(finaleRef.current, { offset: -90, duration: 1.2, immediate: prefersReducedMotion() });
+      lenis.scrollTo(finaleRef.current, {
+        offset: -90,
+        duration: 1.2,
+        immediate: prefersReducedMotion(),
+      });
     });
     return () => cancelAnimationFrame(raf);
   }, [finished, lenis]);
 
-  // Keyboard: 1 to 9 ask the matching question card, C opens the plain CV. Ignored while the CV is open.
   useEffect(() => {
-    if (cvOpen) return;
+    if (!started || cvOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key.toLowerCase() === "c") return openCv();
       const n = Number(e.key);
-      if (Number.isInteger(n) && n >= 1 && n <= 9 && remaining[n - 1]) ask(remaining[n - 1].id);
+      if (Number.isInteger(n) && n >= 1 && n <= 9 && remaining[n - 1])
+        ask(remaining[n - 1].id);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [remaining, ask, cvOpen, openCv]);
+  }, [started, remaining, ask, cvOpen, openCv]);
 
   return (
     <>
@@ -88,6 +98,7 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
           Round {asked.length} / {questions.length}
         </span>
         <div className="flex gap-2">
+          <SoundToggle />
           {hasCv && (
             <a
               href="/cv.pdf"
@@ -106,9 +117,13 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
         </div>
       </header>
 
-      <Hero onIntroDone={onIntroDone} />
+      <Hero play={started} onIntroDone={onIntroDone} />
 
-      <main className="relative mx-auto max-w-5xl px-4 pb-56 pt-16 sm:px-8" role="log" aria-live="polite">
+      <main
+        className="relative mx-auto max-w-5xl px-4 pb-56 pt-16 sm:px-8"
+        role="log"
+        aria-live="polite"
+      >
         {introStarted && <Answer blocks={intro} onDone={onAnswerDone} />}
 
         <div ref={roundsRef}>
@@ -123,7 +138,12 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
                   <motion.span
                     initial={{ scale: 0, rotate: -10 }}
                     animate={{ scale: 1, rotate: -3 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 14, delay: 0.15 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 14,
+                      delay: 0.15,
+                    }}
                     className="rounded-full bg-pink px-4 py-1.5 font-display text-xs tracking-[0.2em] text-ink"
                   >
                     Round {i + 1}
@@ -133,7 +153,9 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
                     layout="position"
                     className="max-w-xl rounded-3xl rounded-tr-md border-4 border-cyan bg-stage-2 px-6 py-4 text-right text-lg font-semibold sm:text-xl"
                   >
-                    <span className="mb-1 block font-display text-[10px] tracking-[0.25em] text-cyan">You asked</span>
+                    <span className="mb-1 block font-display text-[10px] tracking-[0.25em] text-cyan">
+                      You asked
+                    </span>
                     {q.q}
                   </motion.h2>
                 </div>
@@ -150,9 +172,17 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
         )}
       </main>
 
-      {introStarted && remaining.length > 0 && <QuestionDock remaining={remaining} busy={busy} onAsk={ask} />}
+      {introStarted && remaining.length > 0 && (
+        <QuestionDock remaining={remaining} busy={busy} onAsk={ask} />
+      )}
 
-      <AnimatePresence>{cvOpen && <CvSheet hasCv={hasCv} onClose={closeCv} />}</AnimatePresence>
+      <AnimatePresence>
+        {cvOpen && <CvSheet hasCv={hasCv} onClose={closeCv} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {!started && <StartScreen onStart={() => setStarted(true)} />}
+      </AnimatePresence>
     </>
   );
 }

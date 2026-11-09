@@ -1,22 +1,34 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { profile } from "@/content/profile";
 import { gsap, prefersReducedMotion, SplitText, useGSAP } from "@/lib/gsap";
+import { RiveLuka } from "./RiveLuka";
 
-/** Title screen: the show sign, the Rive character slot, and the contestant card. */
-export function Hero({ onIntroDone }: { onIntroDone: () => void }) {
+export function Hero({
+  play,
+  onIntroDone,
+}: {
+  play: boolean;
+  onIntroDone: () => void;
+}) {
   const root = useRef<HTMLElement>(null);
+  const [settled, setSettled] = useState(false);
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) {
+      if (!play) return;
+      const done = () => {
+        setSettled(true);
         onIntroDone();
+      };
+      if (prefersReducedMotion()) {
+        done();
         return;
       }
       const split = new SplitText(".show-title", { type: "chars" });
       gsap
-        .timeline({ delay: 0.15, onComplete: onIntroDone })
+        .timeline({ delay: 0.15, onComplete: done })
         .set(".pre-anim", { visibility: "visible" })
         .from(".marquee", {
           scale: 0.6,
@@ -24,6 +36,7 @@ export function Hero({ onIntroDone }: { onIntroDone: () => void }) {
           opacity: 0,
           duration: 0.9,
           ease: "back.out(1.8)",
+          clearProps: "transform,opacity",
         })
         .from(
           split.chars,
@@ -38,7 +51,13 @@ export function Hero({ onIntroDone }: { onIntroDone: () => void }) {
         )
         .from(
           ".rive-slot",
-          { scale: 0, duration: 0.6, ease: "back.out(2)" },
+          {
+            scale: 0.3,
+            opacity: 0,
+            duration: 0.6,
+            ease: "back.out(2)",
+            clearProps: "transform,opacity",
+          },
           "-=0.5",
         )
         .from(
@@ -47,7 +66,7 @@ export function Hero({ onIntroDone }: { onIntroDone: () => void }) {
           "-=0.3",
         );
     },
-    { scope: root },
+    { scope: root, dependencies: [play] },
   );
 
   return (
@@ -68,11 +87,11 @@ export function Hero({ onIntroDone }: { onIntroDone: () => void }) {
             </h1>
           </div>
 
-          {/* Your Rive character goes here (step 5) */}
-          <div className="rive-slot grid size-40 shrink-0 place-items-center rounded-full border-4 border-dashed border-gold/60 bg-stage/60 text-center text-xs text-gold/80 sm:size-52">
-            Rive Luka
-            <br />
-            goes here
+          <div className="rive-slot relative size-44 shrink-0 overflow-hidden rounded-full border-4 border-gold bg-[radial-gradient(circle_at_50%_38%,#8ff4f5_0%,#2de2e6_45%,#139aa3_100%)] shadow-[0_0_40px_-8px_var(--gold)] sm:size-56">
+            <RiveLuka
+              settled={settled}
+              className="absolute left-[-12.5%] bottom-0 h-[125%] w-[125%]"
+            />
           </div>
         </div>
       </div>
