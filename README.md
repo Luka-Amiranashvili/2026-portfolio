@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CV Show
 
-## Getting Started
+My portfolio, built as a game-show interview. Instead of scrolling through a CV, you pick the questions recruiters usually ask and I answer them, with an animated version of me reacting on screen.
 
-First, run the development server:
+**Live:** _link coming after deploy_
+
+If you're in a hurry, the **Plain CV** button (or the `C` key) opens a normal one-page CV at any point.
+
+## What's inside
+
+- **Interview flow.** Question cards fly into the conversation, answers type out word by word, and the page scrolls to each new answer for you. Number keys `1` to `9` ask questions.
+- **Rive character.** The cartoon of me is a Rive file driven by a view model: he thinks while an answer is "typing", talks while the words appear, celebrates at the finale, and his face follows your cursor. When the title sign scrolls away, he moves into a small "live cam" in the corner.
+- **Sound, off by default.** Every sound, including the background lounge loop and the finale fanfare, is synthesized with the Web Audio API. There are no audio files. The music ducks while answers play and stops when the tab is hidden.
+- **Content in one file.** All questions, answers, projects and skills live in [`src/content/profile.ts`](src/content/profile.ts). Questions without an answer stay hidden.
+- **Accessibility.** Reduced motion is respected across GSAP, Motion, Lenis and Rive, the start screen and CV sheet are proper dialogs, and everything works from the keyboard.
+
+## Stack
+
+Next.js (App Router) · TypeScript · Tailwind CSS · GSAP · Motion · Lenis · Rive · Web Audio API
+
+## Run it locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project layout
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+  app/          layout, page, icons, link preview image
+  components/   Interview, Hero, Answer, QuestionDock, LiveCam, CvSheet, Finale...
+  content/      profile.ts: every word on the site
+  lib/          sound engine, character mood store, GSAP setup
+public/
+  luka.riv      the animated character
+```
 
-## Learn More
+## Credits
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Display font: [Bungee](https://fonts.google.com/specimen/Bungee) by David Jonathan Ross, under the SIL Open Font License ([`assets/Bungee-OFL.txt`](assets/Bungee-OFL.txt)).
