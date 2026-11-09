@@ -198,10 +198,9 @@ const allQuestions: Question[] = [
       },
     ],
   },
-  // TODO(luka): answer these four and they appear on the site automatically.
+  // TODO(luka): answer these three and they appear on the site automatically.
   { id: "start", q: "When can you start?", answer: null },
   { id: "remote", q: "Remote, hybrid or office?", answer: null },
-  { id: "salary", q: "What are your salary expectations?", answer: null },
   { id: "failure", q: "Tell me about something that went wrong.", answer: null },
   {
     id: "education",
