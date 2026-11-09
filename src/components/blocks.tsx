@@ -36,7 +36,7 @@ function StarSticker({ label }: { label: string }) {
       animate={{ scale: 1, rotate: 12 }}
       transition={{ type: "spring", stiffness: 260, damping: 12, delay: 0.5 }}
       onAnimationComplete={() => play("sparkle")}
-      className="absolute -right-4 -top-5 z-10 grid size-24 place-items-center sm:-right-6 sm:-top-7 sm:size-28"
+      className="absolute -right-1 -top-5 z-10 grid size-24 place-items-center sm:-right-6 sm:-top-7 sm:size-28"
     >
       <motion.svg
         viewBox="0 0 100 100"

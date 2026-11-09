@@ -28,10 +28,21 @@ html {
   background: var(--stage);
 }
 
+html,
 body {
-  background: radial-gradient(120% 80% at 50% 0%, var(--stage-2) 0%, var(--stage) 60%);
-  background-attachment: fixed;
+  overflow-x: clip;
+}
+
+body {
   color: var(--ink);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 80% at 50% 0%, var(--stage-2) 0%, var(--stage) 60%);
 }
 
 ::selection {
@@ -52,15 +63,15 @@ body {
 /* ---------- Stage spotlights ---------- */
 .beam {
   position: fixed;
-  top: -10vh;
+  top: -10lvh;
   width: 38vw;
   min-width: 260px;
-  height: 130vh;
+  height: 130lvh;
   pointer-events: none;
-  background: linear-gradient(to bottom, rgb(255 243 196 / 0.22), rgb(255 243 196 / 0) 75%);
+  background: linear-gradient(to bottom, rgb(255 243 196 / 0.16), rgb(255 243 196 / 0) 75%);
   clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%);
   filter: blur(6px);
-  mix-blend-mode: screen;
+  will-change: transform;
 }
 .beam-left {
   left: -6vw;

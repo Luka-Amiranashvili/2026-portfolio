@@ -54,54 +54,53 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
     setMusicDucked(busy || cvOpen);
   }, [busy, cvOpen]);
 
+  const scrollPage = useCallback(
+    (top: number, duration: number) => {
+      const reduced = prefersReducedMotion();
+      if (!lenis || matchMedia("(pointer: coarse)").matches) {
+        window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
+        return;
+      }
+      lenis.resize();
+      lenis.scrollTo(top, { duration, immediate: reduced });
+    },
+    [lenis],
+  );
+
   useEffect(() => {
     const el = introRef.current;
-    if (!introStarted || !lenis || !el) return;
+    if (!introStarted || !el) return;
     const keepAboveDock = () => {
       const dockHeight =
         document.getElementById("question-dock")?.offsetHeight ?? 0;
       const limit = window.innerHeight - dockHeight - 16;
       const overflow = el.getBoundingClientRect().bottom - limit;
-      if (overflow <= 0) return;
-      lenis.resize();
-      lenis.scrollTo(lenis.scroll + overflow, {
-        duration: 0.8,
-        immediate: prefersReducedMotion(),
-      });
+      if (overflow > 0) scrollPage(window.scrollY + overflow, 0.8);
     };
     const observer = new ResizeObserver(keepAboveDock);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [introStarted, lenis]);
+  }, [introStarted, scrollPage]);
 
   useEffect(() => {
     if (asked.length === 0) return;
     const raf = requestAnimationFrame(() => {
       const last = roundsRef.current?.lastElementChild as HTMLElement | null;
-      if (!last || !lenis) return;
-      lenis.resize();
-      lenis.scrollTo(last, {
-        offset: -90,
-        duration: 0.9,
-        immediate: prefersReducedMotion(),
-      });
+      if (!last) return;
+      scrollPage(last.getBoundingClientRect().top + window.scrollY - 90, 0.9);
     });
     return () => cancelAnimationFrame(raf);
-  }, [asked.length, lenis]);
+  }, [asked.length, scrollPage]);
 
   useEffect(() => {
-    if (!finished || !lenis) return;
+    if (!finished) return;
     const raf = requestAnimationFrame(() => {
-      if (!finaleRef.current) return;
-      lenis.resize();
-      lenis.scrollTo(finaleRef.current, {
-        offset: -90,
-        duration: 1.2,
-        immediate: prefersReducedMotion(),
-      });
+      const el = finaleRef.current;
+      if (!el) return;
+      scrollPage(el.getBoundingClientRect().top + window.scrollY - 90, 1.2);
     });
     return () => cancelAnimationFrame(raf);
-  }, [finished, lenis]);
+  }, [finished, scrollPage]);
 
   useEffect(() => {
     if (!started || cvOpen) return;
