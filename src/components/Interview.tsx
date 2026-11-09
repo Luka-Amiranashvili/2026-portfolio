@@ -10,6 +10,7 @@ import { Answer } from "./Answer";
 import { CvSheet } from "./CvSheet";
 import { Finale } from "./Finale";
 import { Hero } from "./Hero";
+import { LiveCam } from "./LiveCam";
 import { QuestionDock } from "./QuestionDock";
 import { SoundToggle } from "./SoundToggle";
 import { StartScreen } from "./StartScreen";
@@ -208,6 +209,8 @@ export function Interview({ hasCv }: { hasCv: boolean }) {
       <AnimatePresence>
         {cvOpen && <CvSheet hasCv={hasCv} onClose={closeCv} />}
       </AnimatePresence>
+
+      {started && !cvOpen && <LiveCam />}
 
       <AnimatePresence>
         {!started && <StartScreen onStart={() => setStarted(true)} />}
